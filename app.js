@@ -11,6 +11,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+// Define a map of product categories to corresponding data
+const productDataMap = {
+  shoes: { title: 'Shoes', introduction: 'Explore our latest shoe collection.' },
+  clothes: { title: 'Clothes', introduction: 'Discover trendy clothing styles.' },
+  bags: { title: 'Bags', introduction: 'Browse our stylish bags and accessories.' }
+};
+
 // database connection
 const db = mysql.createConnection({
   host: 'localhost',
@@ -30,6 +37,7 @@ db.connect((err) => {
 app.get('/', (req, res) => {
   res.render('login');
 });
+
 // enter the username  sampleUser' -- 
 // enter the password anything
 // app.post('/login', (req, res) => {
@@ -39,6 +47,7 @@ app.get('/', (req, res) => {
 //   const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
 
 //   db.query(sql, (err, result) => {
+//     console.log(sql)
 //     if (err) {
 //       console.error(err); 
 //       res.send('An error occurred. Please try again later.'); 
@@ -72,7 +81,29 @@ app.post('/login', (req, res) => {
   });
 });
 
+// user input: 
+// 1) test the number of properties queried: 
+// ' UNION SELECT NULL -- 
+// ' UNION SELECT NULL,NULL --   (correct)
+// ' UNION SELECT NULL,NULL,NULL--
+// 2) test the type of properties
+// ' UNION SELECT 'a','test',
+// 3) input: category=bags%27+union+select+username,password+from+users%20--%20
+app.get('/products', (req, res) => {
+  // Get the query parameter 'category'
+  const category = req.query.category;
+  const sql = `SELECT name,description FROM products WHERE category = '${category}'`;
 
+  db.query(sql, (err, result) => {
+    console.log(sql)
+    if (err) {
+      console.error(err); 
+      res.send('An error occurred. Please try again later.'); 
+    } else {
+      res.render('products', { result, category });
+    }
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -89,13 +89,28 @@ app.post('/login', (req, res) => {
 // 2) test the type of properties
 // ' UNION SELECT 'a','test',
 // 3) input: category=bags%27+union+select+username,password+from+users%20--%20
-app.get('/products', (req, res) => {
-  // Get the query parameter 'category'
-  const category = req.query.category;
-  const sql = `SELECT name,description FROM products WHERE category = '${category}'`;
+// app.get('/products', (req, res) => {
+//   // Get the query parameter 'category'
+//   const category = req.query.category;
+//   const sql = `SELECT name,description FROM products WHERE category = '${category}'`;
 
-  db.query(sql, (err, result) => {
-    console.log(sql)
+//   db.query(sql, [category], (err, result) => {
+//     console.log(sql)
+//     if (err) {
+//       console.error(err); 
+//       res.send('An error occurred. Please try again later.'); 
+//     } else {
+//       res.render('products', { result, category });
+//     }
+//   });
+// });
+
+// parametized query
+app.get('/products', (req, res) => {
+  const category = req.query.category;
+  const sql = `SELECT name,description FROM products WHERE category = ?`;
+
+  db.query(sql, [category], (err, result) => {
     if (err) {
       console.error(err); 
       res.send('An error occurred. Please try again later.'); 

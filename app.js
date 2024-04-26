@@ -5,6 +5,8 @@ const app = express();
 const port = 3000;
 require('dotenv').config();
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -89,13 +91,28 @@ app.post('/login', (req, res) => {
 // 2) test the type of properties
 // ' UNION SELECT 'a','test',
 // 3) input: category=bags%27+union+select+username,password+from+users%20--%20
+app.get('/products', (req, res) => {
+  // Get the query parameter 'category'
+  const category = req.query.category;
+  const sql = `SELECT name,description FROM products WHERE category = '${category}'`;
+
+  db.query(sql, [category], (err, result) => {
+    console.log(sql)
+    if (err) {
+      console.error(err); 
+      res.send('An error occurred. Please try again later.'); 
+    } else {
+      res.render('products', { result, category });
+    }
+  });
+});
+
+// parametized query
 // app.get('/products', (req, res) => {
-//   // Get the query parameter 'category'
 //   const category = req.query.category;
-//   const sql = `SELECT name,description FROM products WHERE category = '${category}'`;
+//   const sql = `SELECT name,description FROM products WHERE category = ?`;
 
 //   db.query(sql, [category], (err, result) => {
-//     console.log(sql)
 //     if (err) {
 //       console.error(err); 
 //       res.send('An error occurred. Please try again later.'); 
@@ -105,20 +122,51 @@ app.post('/login', (req, res) => {
 //   });
 // });
 
-// parametized query
-app.get('/products', (req, res) => {
-  const category = req.query.category;
-  const sql = `SELECT name,description FROM products WHERE category = ?`;
+app.get('/check-session', (req, res) => {
+  const cookie_id = req.cookies['cookie_id'];
 
-  db.query(sql, [category], (err, result) => {
-    if (err) {
-      console.error(err); 
-      res.send('An error occurred. Please try again later.'); 
-    } else {
-      res.render('products', { result, category });
-    }
+  if (!cookie_id) {
+      return res.redirect('/');
+  }
+
+  const sql = `SELECT * FROM sessions WHERE cookie_id = '${cookie_id}'`;
+  
+  db.query(sql, (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send('Database error');
+      }
+
+      if (results.length > 0) {
+          res.send('Welcome back');
+      } else {
+          res.redirect('/');
+      }
   });
 });
+
+// app.get('/check-session', (req, res) => {
+//   const cookie_id = req.cookies['cookie_id'];
+
+//   if (!cookie_id) {
+//       return res.redirect('/');
+//   }
+
+//   const sql = 'SELECT * FROM sessions WHERE cookie_id = ?';
+//   db.query(sql, [cookie_id], (err, results) => {
+//       if (err) {
+//           console.error(err);
+//           return res.status(500).send('Database error');
+//       }
+
+//       if (results.length > 0) {
+//           res.send('Welcome back');
+//       } else {
+//           res.redirect('/');
+//       }
+//   });
+// });
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

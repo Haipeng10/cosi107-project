@@ -16,9 +16,9 @@ def sqli_password():
                 break
 
 def main():
-    print("(+) Retrieving admin password...")
+    print("Retrieving password...")
     sqli_password()
-    print("\n(+) Done")
+    print("\n Done")
 
 if __name__ == "__main__":
     main()

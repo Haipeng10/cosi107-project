@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
 //     console.log(sql)
 //     if (err) {
 //       console.error(err); 
-//       res.send('An error occurred. Please try again later.'); 
+//       res.send('Error. Please try again.'); 
 //     } else {
 //       if (result.length > 0) {
 //         res.send('Login successful');
@@ -72,7 +72,7 @@ app.post('/login', (req, res) => {
   db.query(sql, [username, password], (err, result) => {
     if (err) {
       console.error(err); 
-      res.send('An error occurred. Please try again later.'); 
+      res.send('Error. Please try again.'); 
     } else {
       if (result.length > 0) {
         res.send('Login successful');
@@ -100,7 +100,7 @@ app.get('/products', (req, res) => {
     console.log(sql)
     if (err) {
       console.error(err); 
-      res.send('An error occurred. Please try again later.'); 
+      res.send('Error. Please try again.'); 
     } else {
       res.render('products', { result, category });
     }
@@ -115,7 +115,7 @@ app.get('/products', (req, res) => {
 //   db.query(sql, [category], (err, result) => {
 //     if (err) {
 //       console.error(err); 
-//       res.send('An error occurred. Please try again later.'); 
+//       res.send('Error. Please try again.'); 
 //     } else {
 //       res.render('products', { result, category });
 //     }
